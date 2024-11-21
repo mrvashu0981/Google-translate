@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>payment page</title>
+</head>
+<body>
+    <form id="onlineform" >
+        Enter your name <input type="text" id="name" required>
+        <br><br>
+        Enter your Email  <input type="email" id="email" required>
+        <br><br>
+        Enter your Mo number <input type="number" id="mobile" required>
+        <br><br>
+        Enter Amount to pay <input type="numbher" id="amount" required>
+        <br><br>
+        <button id="btn1"> Pay now</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.7.1.js">
+
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        $(document).ready(function(){
+      
+                  $("#onlineform").submit(function(e){
+
+                     e.preventDefault();
+                      $("#btn1").prop("disabled",true);
+
+                      var amt=$("#amount").val();
+                       $.ajax({
+                        url:"https://phpcrud.himanshukashyap.com/rzp/createOrder.php?amount=" + amt,
+                        type : "get",
+                        error:function() {
+                            alert("Error in Ajax");
+                         },
+                        success: function(data){
+                            var key =data.key;
+                            var token = data.token;
+
+                            // Configure all parameters for payment
+                        var options = {
+                            "key": key,
+                            "amount": amt*100,
+                            "currency": "INR",
+                            "name": "DigiCoders Technologies",
+                            "description": "Test Transaction",
+                            "image": "img.jpeg",
+                            "order_id": token,
+                            "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                            "prefill": {
+                                "name": $("#name").val(),
+                                "email": $("#email").val(),
+                                "contact": $("#mobile").val()
+                            },
+                            "notes": {
+                                "address": "DigiCoders Technologies Private Limited, Lucknow, UP"
+                            },
+                            "theme": {
+                                "color": "#3399cc"
+                            }, 
+
+                            // Handle Success Response
+                            "handler": function(response) {
+                                alert("Payment Success");
+                                window.location.href="success.html";
+                            }
+                        };
+
+                        // Initialize Razorpay SDK
+                        var rzp1 = new Razorpay(options);
+
+                        // Open Razorpay
+                        rzp1.open();
+
+
+                        // Handle Payment Fail Response
+                        rzp1.on('payment.failed', function (response){
+                            alert("Payment Failed");
+                            window.location.href="failed.html";
+                        });
+                        }
+
+                            
+                        });
+
+                       
+                  });
+
+        });
+    </script>
+</body>
+</html>
